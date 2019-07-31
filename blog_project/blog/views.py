@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.db.models import Q
 from .models import Blog 
 from .forms import BlogPost
 
@@ -52,3 +53,12 @@ def blogpost(request):
     else:
         form = BlogPost()
         return render(request, 'new.html', {'form':form})
+
+def search(request):
+    if request.method == 'POST':
+        search_word = request.POST['search_word']
+        blog_list = Blog.objects.filter(
+            Q(title__icontains=search_word) # Q 객체를 사용해서 검색
+        ).distinct() # 중복 제거
+        return render(request, 'search.html', {'blog_list':blog_list, 'search_word':search_word})
+    return render(request, 'home.html')

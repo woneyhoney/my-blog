@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block contents %}
+{% if blog_list %} 
+{% for blog in blog_list %} 
+<a href="{{ blog.get_absolute_url }}">{{ blog.title }}</a>
+{% endfor %} 
+{% elif search_word %} 
+Search Word {{ search_word }} Not Found! 
+{% endif %}
+{% endblock %}

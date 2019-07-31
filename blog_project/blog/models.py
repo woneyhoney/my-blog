@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 class Blog(models.Model):
     title = models.CharField(max_length=200)
@@ -10,5 +11,8 @@ class Blog(models.Model):
     
     def summary(self):
         return self.body[:100]
+
+    def get_absolute_url(self):
+        return '/blog/'+str(self.id)
 
 # models.뭐뭐뭐Field(블라블라)
