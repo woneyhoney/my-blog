@@ -1,27 +1,36 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib import auth
+from .forms import UserForm, LoginForm
 
 def signup(request):
     if request.method == 'POST':
-        if request.POST['password1'] == request.POST['password2']:
-            user = User.objects.create_user(username=request.POST['username'], password=request.POST['password1'])
-            auth.login(request, user) # 회원가입하고 자동적으로 로그인 시켜줌
-            return redirect('home') 
-    return render(request, 'signup.html')
+        form = UserForm(request.POST)
+        if form.is_valid():
+            new_user = User.objects.create_user(**form.cleaned_data)
+            auth.login(request, new_user)
+            return redirect('home')
+    else:
+        form = UserForm()
+        return render(request, 'signup.html', {'form':form})
 
 def login(request):
-    if request.POST == 'POST':
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
         username = request.POST['username']
         password = request.POST['password']
         user = auth.authenticate(request, username=username, password=password)
         if user is not None:
-            auth.login(request, user)
-            return redirect('home')
+            if user.is_active:
+                auth.login(request, user)
+                return redirect('home')
+            else:
+                return render(request, 'login.html', {'error' : 'invalid login'})
         else:
             return render(request, 'login.html', {'error' : 'username or password is incorrect'})
     else:
-        return render(request, 'login.html')
+        form = LoginForm()
+        return render(request, 'login.html', {'form':form})
 
 def logout(request):
     if request.method == 'POST':
