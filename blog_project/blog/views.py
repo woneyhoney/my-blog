@@ -58,7 +58,7 @@ def search(request):
     if request.method == 'POST':
         search_word = request.POST['search_word']
         blog_list = Blog.objects.filter(
-            Q(title__icontains=search_word) # Q 객체를 사용해서 검색
+            Q(title__icontains=search_word) | Q(body__icontains=search_word) # Q 객체를 사용해서 검색
         ).distinct() # 중복 제거
         return render(request, 'search.html', {'blog_list':blog_list, 'search_word':search_word})
     return render(request, 'home.html')
